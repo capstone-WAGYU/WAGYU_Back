@@ -29,6 +29,14 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.fail(HttpStatus.BAD_REQUEST, msg));
     }
 
+    // CustomException
+    public ResponseEntity<ApiResponse<Void>> handleCustomException(CustomException ex){
+        log.warn("[{}] {}", ex.getClass().getSimpleName(), ex.getMessage());
+        return ResponseEntity
+                .status(ex.getErrorCode().getStatus())
+                .body(ApiResponse.fail(ex.getErrorCode().getStatus(), ex.getMessage()));
+    }
+
     // 그 외 모든 예외
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleException(Exception ex){

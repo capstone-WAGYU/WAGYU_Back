@@ -1,7 +1,88 @@
 package com.wagyu.wagyu_back.domain.auth.service;
 
+import static com.wagyu.wagyu_back.global.security.TokenConstants.*;
+
+import com.wagyu.wagyu_back.domain.auth.dto.*;
+import com.wagyu.wagyu_back.domain.auth.entity.RefreshToken;
+import com.wagyu.wagyu_back.domain.auth.repository.RefreshTokenRepository;
+import com.wagyu.wagyu_back.domain.user.entity.User;
+import com.wagyu.wagyu_back.domain.user.service.UserService;
+import com.wagyu.wagyu_back.global.exception.CustomException;
+import com.wagyu.wagyu_back.global.exception.ErrorCode;
+import com.wagyu.wagyu_back.global.security.jwt.TokenProvider;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
 @Service
+@RequiredArgsConstructor
 public class AuthService {
+    private final UserService userService;
+    private final RefreshTokenRepository refreshTokenRepository;
+
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final TokenProvider tokenProvider;
+
+    public void register(RegisterRequestDTO registerRequestDTO) {
+        if (userService.existsByUsername(registerRequestDTO.getUsername())) {
+            throw new CustomException(ErrorCode.DUPLICATE_USERNAME);
+        }
+
+        User user = User.builder()
+                .username(registerRequestDTO.getUsername())
+                .password(passwordEncoder.encode(registerRequestDTO.getPassword()))
+                .nickname(registerRequestDTO.getNickname())
+                .build();
+
+        userService.save(user);
+    }
+
+    public LoginResponseDTO login(LoginRequestDTO dto) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword())
+        );
+
+        String accessToken = tokenProvider.createToken(dto.getUsername());
+        String refreshToken = tokenProvider.createRefreshToken(dto.getUsername());
+
+        User user = userService.findByUsername(dto.getUsername());
+
+        RefreshToken rf = RefreshToken.builder()
+                .user(user)
+                .token(refreshToken)
+                .expiryDate(LocalDateTime.now().plus(REFRESH_TOKEN_VALIDITY, ChronoUnit.MILLIS))
+                .build();
+        refreshTokenRepository.save(rf);
+
+        return LoginResponseDTO.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
+
+    public RefreshResponseDTO refresh(RefreshRequestDTO dto) {
+        if (!tokenProvider.validateToken(dto.getRefreshToken())) {
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
+        }
+
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(dto.getRefreshToken())
+                .orElseThrow(() -> new CustomException(ErrorCode.TOKEN_NOT_FOUND));
+
+        if (refreshToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new CustomException(ErrorCode.TOKEN_EXPIRED);
+        }
+
+        String username = tokenProvider.getUsername(refreshToken.getToken());
+        String newAccessToken = tokenProvider.createToken(username);
+
+        return RefreshResponseDTO.builder()
+                .accessToken(newAccessToken)
+                .build();
+    }
 }

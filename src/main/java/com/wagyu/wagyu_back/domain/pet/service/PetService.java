@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,24 +25,23 @@ public class PetService {
 
     private final PetRepository petRepository;
 
+    @Transactional
     public PetListResponseDTO getPets(String username) {
         User owner = userService.findByUsername(username);
 
-        List<Pet> pets = petRepository.findAllByOwner(owner);
-        List<PetResponseDTO> petResponseDTOS = new ArrayList<>();
-        for (Pet pet : pets) {
-            PetResponseDTO petResponseDTO = PetResponseDTO.builder()
-                    .id(pet.getId())
-                    .name(pet.getName())
-                    .age(pet.getAge())
-                    .breed(pet.getBreed())
-                    .gender(pet.getGender())
-                    .build();
-            petResponseDTOS.add(petResponseDTO);
-        }
+        List<Pet> pets = petRepository.findAllByOwnerAndIsDeletedFalse(owner);
+        List<PetResponseDTO> petResponseDTOS = pets.stream().map(pet -> PetResponseDTO.builder()
+                .id(pet.getId())
+                .name(pet.getName())
+                .age(pet.getAge())
+                .breed(pet.getBreed())
+                .gender(pet.getGender())
+                .build()
+        ).collect(Collectors.toList());
         return PetListResponseDTO.builder().pets(petResponseDTOS).build();
     }
 
+    @Transactional
     public void createPet(String username, PetCreateRequestDTO dto) {
         User owner = userService.findByUsername(username);
 
@@ -56,9 +56,26 @@ public class PetService {
     }
 
     @Transactional
-    public void updatePet(Long petId, PetUpdateRequestDTO dto) {
-        Pet pet = petRepository.findById(petId)
+    public void updatePet(String username, Long petId, PetUpdateRequestDTO dto) {
+        User owner = userService.findByUsername(username);
+        Pet pet = petRepository.findByIdAndIsDeletedFalse(petId)
                 .orElseThrow(() -> new CustomException(ErrorCode.PET_NOT_FOUND));
+
+        if (!pet.getOwner().getId().equals(owner.getId())) {
+            throw new CustomException(ErrorCode.FORBIDDEN_PET_UPDATE);
+        }
         pet.update(dto.getName(), dto.getAge(), dto.getBreed(), dto.getGender());
+    }
+
+    @Transactional
+    public void deletePet(String username, Long petId) {
+        User owner = userService.findByUsername(username);
+        Pet pet = petRepository.findByIdAndIsDeletedFalse(petId)
+                .orElseThrow(() -> new CustomException(ErrorCode.PET_NOT_FOUND));
+
+        if (!pet.getOwner().getId().equals(owner.getId())) {
+            throw new CustomException(ErrorCode.FORBIDDEN_PET_DELETE);
+        }
+        pet.delete();
     }
 }

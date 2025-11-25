@@ -45,10 +45,17 @@ public class Pet {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
+    @Column(nullable = false, name = "is_deleted")
+    private Boolean isDeleted;
+
     public void update(String name, Short age, String breed, Character gender) {
         this.name = name;
         this.age = age;
         this.breed = breed;
         this.gender = gender;
+    }
+
+    public void delete() {
+        this.isDeleted = true;
     }
 }

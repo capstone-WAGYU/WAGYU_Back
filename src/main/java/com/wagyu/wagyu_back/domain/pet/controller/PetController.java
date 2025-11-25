@@ -29,8 +29,15 @@ public class PetController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<ApiResponse<Void>> updatePet(@PathVariable Long id, @RequestBody PetUpdateRequestDTO dto) {
-        petService.updatePet(id, dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("반려동물 정보가 수정되었습니다."));
+    public ResponseEntity<ApiResponse<Void>> updatePet(Authentication authentication, @PathVariable Long id, @RequestBody PetUpdateRequestDTO dto) {
+        petService.updatePet(authentication.getName(), id, dto);
+        return ResponseEntity.ok(ApiResponse.success("반려동물 정보가 수정되었습니다."));
     }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<ApiResponse<Void>> deletePet(Authentication authentication, @PathVariable Long id) {
+        petService.deletePet(authentication.getName(), id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
 }

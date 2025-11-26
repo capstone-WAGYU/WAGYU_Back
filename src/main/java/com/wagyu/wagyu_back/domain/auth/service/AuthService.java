@@ -4,6 +4,7 @@ import static com.wagyu.wagyu_back.global.security.TokenConstants.*;
 
 import com.wagyu.wagyu_back.domain.auth.dto.*;
 import com.wagyu.wagyu_back.domain.auth.entity.RefreshToken;
+import com.wagyu.wagyu_back.domain.auth.enums.AuthLevel;
 import com.wagyu.wagyu_back.domain.auth.repository.RefreshTokenRepository;
 import com.wagyu.wagyu_back.domain.user.entity.User;
 import com.wagyu.wagyu_back.domain.user.service.UserService;
@@ -38,6 +39,7 @@ public class AuthService {
                 .username(registerRequestDTO.getUsername())
                 .password(passwordEncoder.encode(registerRequestDTO.getPassword()))
                 .nickname(registerRequestDTO.getNickname())
+                .authLevel(AuthLevel.USER)
                 .build();
 
         userService.save(user);

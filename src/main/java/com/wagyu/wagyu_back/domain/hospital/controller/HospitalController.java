@@ -1,8 +1,8 @@
 package com.wagyu.wagyu_back.domain.hospital.controller;
 
-import com.wagyu.wagyu_back.domain.hospital.dto.HospitalDetailResponseDTO;
-import com.wagyu.wagyu_back.domain.hospital.dto.HospitalScheduleResponseDTO;
-import com.wagyu.wagyu_back.domain.hospital.dto.HospitalSummaryResponseDTO;
+import com.wagyu.wagyu_back.domain.hospital.dto.response.HospitalDetailResponseDTO;
+import com.wagyu.wagyu_back.domain.hospital.dto.response.HospitalScheduleResponseDTO;
+import com.wagyu.wagyu_back.domain.hospital.dto.response.HospitalSummaryResponseDTO;
 import com.wagyu.wagyu_back.domain.hospital.service.HospitalService;
 import com.wagyu.wagyu_back.global.dto.ApiResponse;
 import lombok.RequiredArgsConstructor;

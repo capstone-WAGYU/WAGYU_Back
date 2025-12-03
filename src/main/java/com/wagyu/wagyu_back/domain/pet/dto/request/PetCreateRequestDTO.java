@@ -1,10 +1,10 @@
-package com.wagyu.wagyu_back.domain.pet.dto;
+package com.wagyu.wagyu_back.domain.pet.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
 @Getter
-public class PetUpdateRequestDTO {
+public class PetCreateRequestDTO {
     @NotBlank
     private String name;
 

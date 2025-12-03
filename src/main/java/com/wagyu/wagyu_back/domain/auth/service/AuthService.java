@@ -2,7 +2,11 @@ package com.wagyu.wagyu_back.domain.auth.service;
 
 import static com.wagyu.wagyu_back.global.security.TokenConstants.*;
 
-import com.wagyu.wagyu_back.domain.auth.dto.*;
+import com.wagyu.wagyu_back.domain.auth.dto.request.LoginRequestDTO;
+import com.wagyu.wagyu_back.domain.auth.dto.request.RefreshRequestDTO;
+import com.wagyu.wagyu_back.domain.auth.dto.request.RegisterRequestDTO;
+import com.wagyu.wagyu_back.domain.auth.dto.response.LoginResponseDTO;
+import com.wagyu.wagyu_back.domain.auth.dto.response.RefreshResponseDTO;
 import com.wagyu.wagyu_back.domain.auth.entity.RefreshToken;
 import com.wagyu.wagyu_back.domain.auth.enums.AuthLevel;
 import com.wagyu.wagyu_back.domain.auth.repository.RefreshTokenRepository;

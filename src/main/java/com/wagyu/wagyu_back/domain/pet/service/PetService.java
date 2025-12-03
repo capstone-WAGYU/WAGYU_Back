@@ -1,9 +1,9 @@
 package com.wagyu.wagyu_back.domain.pet.service;
 
-import com.wagyu.wagyu_back.domain.pet.dto.PetCreateRequestDTO;
-import com.wagyu.wagyu_back.domain.pet.dto.PetListResponseDTO;
-import com.wagyu.wagyu_back.domain.pet.dto.PetResponseDTO;
-import com.wagyu.wagyu_back.domain.pet.dto.PetUpdateRequestDTO;
+import com.wagyu.wagyu_back.domain.pet.dto.request.PetCreateRequestDTO;
+import com.wagyu.wagyu_back.domain.pet.dto.response.PetListResponseDTO;
+import com.wagyu.wagyu_back.domain.pet.dto.response.PetResponseDTO;
+import com.wagyu.wagyu_back.domain.pet.dto.request.PetUpdateRequestDTO;
 import com.wagyu.wagyu_back.domain.pet.entity.Pet;
 import com.wagyu.wagyu_back.domain.pet.repository.PetRepository;
 import com.wagyu.wagyu_back.domain.user.entity.User;

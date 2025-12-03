@@ -1,4 +1,4 @@
-package com.wagyu.wagyu_back.domain.auth.dto;
+package com.wagyu.wagyu_back.domain.auth.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;

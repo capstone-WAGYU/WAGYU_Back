@@ -1,9 +1,8 @@
-package com.wagyu.wagyu_back.domain.hospital.dto;
+package com.wagyu.wagyu_back.domain.hospital.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalTime;
 import java.util.List;
 
 @Getter

@@ -1,6 +1,6 @@
 package com.wagyu.wagyu_back.domain.hospital.service;
 
-import com.wagyu.wagyu_back.domain.hospital.dto.*;
+import com.wagyu.wagyu_back.domain.hospital.dto.response.*;
 import com.wagyu.wagyu_back.domain.hospital.entity.Hospital;
 import com.wagyu.wagyu_back.domain.hospital.entity.HospitalSchedule;
 import com.wagyu.wagyu_back.domain.hospital.entity.HospitalScheduleException;

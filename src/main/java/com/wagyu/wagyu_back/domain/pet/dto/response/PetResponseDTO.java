@@ -1,4 +1,4 @@
-package com.wagyu.wagyu_back.domain.pet.dto;
+package com.wagyu.wagyu_back.domain.pet.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;

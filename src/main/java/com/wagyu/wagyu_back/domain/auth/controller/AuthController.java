@@ -1,6 +1,10 @@
 package com.wagyu.wagyu_back.domain.auth.controller;
 
-import com.wagyu.wagyu_back.domain.auth.dto.*;
+import com.wagyu.wagyu_back.domain.auth.dto.request.LoginRequestDTO;
+import com.wagyu.wagyu_back.domain.auth.dto.request.RefreshRequestDTO;
+import com.wagyu.wagyu_back.domain.auth.dto.request.RegisterRequestDTO;
+import com.wagyu.wagyu_back.domain.auth.dto.response.LoginResponseDTO;
+import com.wagyu.wagyu_back.domain.auth.dto.response.RefreshResponseDTO;
 import com.wagyu.wagyu_back.domain.auth.service.AuthService;
 import com.wagyu.wagyu_back.global.dto.ApiResponse;
 import jakarta.validation.Valid;

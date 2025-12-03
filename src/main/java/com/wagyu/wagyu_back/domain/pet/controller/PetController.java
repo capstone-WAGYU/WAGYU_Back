@@ -1,8 +1,8 @@
 package com.wagyu.wagyu_back.domain.pet.controller;
 
-import com.wagyu.wagyu_back.domain.pet.dto.PetCreateRequestDTO;
-import com.wagyu.wagyu_back.domain.pet.dto.PetListResponseDTO;
-import com.wagyu.wagyu_back.domain.pet.dto.PetUpdateRequestDTO;
+import com.wagyu.wagyu_back.domain.pet.dto.request.PetCreateRequestDTO;
+import com.wagyu.wagyu_back.domain.pet.dto.response.PetListResponseDTO;
+import com.wagyu.wagyu_back.domain.pet.dto.request.PetUpdateRequestDTO;
 import com.wagyu.wagyu_back.domain.pet.service.PetService;
 import com.wagyu.wagyu_back.global.dto.ApiResponse;
 import lombok.RequiredArgsConstructor;

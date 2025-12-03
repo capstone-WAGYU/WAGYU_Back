@@ -1,4 +1,4 @@
-package com.wagyu.wagyu_back.domain.auth.dto;
+package com.wagyu.wagyu_back.domain.auth.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -6,13 +6,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class RegisterRequestDTO {
+public class LoginRequestDTO {
     @NotBlank
     private String username;
 
     @NotBlank
     private String password;
-
-    @NotBlank
-    private String nickname;
 }

@@ -1,5 +1,8 @@
 package com.wagyu.wagyu_back.domain.hospital.service;
 
+import com.wagyu.wagyu_back.domain.hospital.dto.HospitalDetailResponseDTO;
+import com.wagyu.wagyu_back.domain.hospital.dto.HospitalDetailScheduleExceptionResponseDTO;
+import com.wagyu.wagyu_back.domain.hospital.dto.HospitalDetailScheduleResponseDTO;
 import com.wagyu.wagyu_back.domain.hospital.dto.HospitalSummaryResponseDTO;
 import com.wagyu.wagyu_back.domain.hospital.entity.Hospital;
 import com.wagyu.wagyu_back.domain.hospital.entity.HospitalSchedule;
@@ -23,7 +26,6 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class HospitalService {
     private final HospitalRepository hospitalRepository;
     private final HospitalScheduleRepository hospitalScheduleRepository;
@@ -60,5 +62,33 @@ public class HospitalService {
                     .build();
         }).toList();
         return new PageImpl<>(hospitalSummaryResponseDTOS, pageable, hospitals.size());
+    }
+
+    public HospitalDetailResponseDTO getHospitalDetail(Long hospitalId) {
+        Hospital hospital = hospitalRepository.findById(hospitalId)
+                .orElseThrow(() -> new CustomException(ErrorCode.HOSPITAL_NOT_FOUND));
+
+        List<HospitalSchedule> schedules = hospitalScheduleRepository.findAllByHospitalId(hospitalId);
+        List<HospitalDetailScheduleResponseDTO> scheduleDTOs = schedules.stream()
+                .map((s) -> HospitalDetailScheduleResponseDTO.builder()
+                        .dayOfWeek(s.getDayOfWeek())
+                        .isClosed(s.isClosed())
+                        .build()
+                ).toList();
+
+        List<HospitalScheduleException> scheduleExceptions = hospitalScheduleExceptionRepository.findAllByHospitalId(hospitalId);
+        List<HospitalDetailScheduleExceptionResponseDTO> scheduleExceptionDTOs = scheduleExceptions.stream()
+                .map((s) -> HospitalDetailScheduleExceptionResponseDTO.builder()
+                        .date(s.getDate())
+                        .isClosed(s.isClosed())
+                        .build()
+                ).toList();
+
+        return HospitalDetailResponseDTO.builder()
+                .name(hospital.getName())
+                .address(hospital.getAddress())
+                .schedules(scheduleDTOs)
+                .scheduleExceptions(scheduleExceptionDTOs)
+                .build();
     }
 }

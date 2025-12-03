@@ -1,9 +1,6 @@
 package com.wagyu.wagyu_back.domain.hospital.service;
 
-import com.wagyu.wagyu_back.domain.hospital.dto.HospitalDetailResponseDTO;
-import com.wagyu.wagyu_back.domain.hospital.dto.HospitalDetailScheduleExceptionResponseDTO;
-import com.wagyu.wagyu_back.domain.hospital.dto.HospitalDetailScheduleResponseDTO;
-import com.wagyu.wagyu_back.domain.hospital.dto.HospitalSummaryResponseDTO;
+import com.wagyu.wagyu_back.domain.hospital.dto.*;
 import com.wagyu.wagyu_back.domain.hospital.entity.Hospital;
 import com.wagyu.wagyu_back.domain.hospital.entity.HospitalSchedule;
 import com.wagyu.wagyu_back.domain.hospital.entity.HospitalScheduleException;
@@ -13,7 +10,6 @@ import com.wagyu.wagyu_back.domain.hospital.repository.HospitalScheduleRepositor
 import com.wagyu.wagyu_back.global.exception.CustomException;
 import com.wagyu.wagyu_back.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -89,6 +85,32 @@ public class HospitalService {
                 .address(hospital.getAddress())
                 .schedules(scheduleDTOs)
                 .scheduleExceptions(scheduleExceptionDTOs)
+                .build();
+    }
+
+    // 병원 스케줄 조회
+    public HospitalScheduleResponseDTO getHospitalSchedule(Long hospitalId, LocalDate date) {
+        Hospital hospital = hospitalRepository.findById(hospitalId)
+                .orElseThrow(() -> new CustomException(ErrorCode.HOSPITAL_NOT_FOUND));
+
+        Optional<HospitalScheduleException> optExSchedule =  hospitalScheduleExceptionRepository.findByHospitalIdAndDate(hospitalId, date);
+        if  (optExSchedule.isPresent()) {
+            HospitalScheduleException exSchedule = optExSchedule.get();
+            return HospitalScheduleResponseDTO.builder()
+                    .openTime(exSchedule.getOpenTime())
+                    .closeTime(exSchedule.getCloseTime())
+                    .isClosed(exSchedule.isClosed() || LocalTime.now().isAfter(exSchedule.getCloseTime()))
+                    .build();
+        }
+
+        HospitalSchedule schedule = hospitalScheduleRepository
+                .findByHospitalIdAndDayOfWeek(hospitalId, (short) date.getDayOfWeek().getValue())
+                .orElseThrow(() -> new CustomException(ErrorCode.HOSPITAL_NO_SCHEDULE));
+
+        return HospitalScheduleResponseDTO.builder()
+                .openTime(schedule.getOpenTime())
+                .closeTime(schedule.getCloseTime())
+                .isClosed(schedule.isClosed() || LocalTime.now().isAfter(schedule.getCloseTime()))
                 .build();
     }
 }

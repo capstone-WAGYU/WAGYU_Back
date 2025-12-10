@@ -19,6 +19,8 @@ public enum ErrorCode {
     FORBIDDEN_PET_DELETE(HttpStatus.FORBIDDEN, "해당 반려동물 정보를 삭제할 권한이 없습니다."),
     MAXIMUM_PET_COUNT(HttpStatus.FORBIDDEN, "더 이상 반려동물을 추가할 수 없습니다."),
 
+    BREED_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 견종을 찾을 수 없습니다."),
+
     HOSPITAL_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 병원이 존재하지 않습니다."),
     HOSPITAL_NO_SCHEDULE(HttpStatus.NOT_FOUND, "병원 일정이 존재하지 않습니다.");
 

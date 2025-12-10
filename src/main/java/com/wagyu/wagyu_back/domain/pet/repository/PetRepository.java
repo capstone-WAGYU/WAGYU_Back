@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PetRepository extends JpaRepository<Pet, Long> {
-    Optional<Integer> countAllByOwnerAndIsDeletedFalse(User owner);
+    Optional<Integer> countAllByOwnerIdAndIsDeletedFalse(Long ownerId);
     Optional<Pet> findByIdAndIsDeletedFalse(Long id);
-    List<Pet> findAllByOwnerAndIsDeletedFalse(User owner);
+    List<Pet> findAllByOwnerIdAndIsDeletedFalse(Long ownerId);
 }

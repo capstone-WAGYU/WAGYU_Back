@@ -3,6 +3,8 @@ package com.wagyu.wagyu_back.domain.pet.dto.request;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 public class PetCreateRequestDTO {
     @NotBlank
@@ -12,8 +14,11 @@ public class PetCreateRequestDTO {
     private Short age;
 
     @NotBlank
-    private String breed;
+    private Long breedId;
 
     @NotBlank
     private Character gender;
+
+    @NotBlank
+    private List<Long> diseaseIds;
 }

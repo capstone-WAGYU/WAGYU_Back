@@ -1,5 +1,7 @@
 package com.wagyu.wagyu_back.domain.pet.entity;
 
+import com.wagyu.wagyu_back.domain.breed.entity.Breed;
+import com.wagyu.wagyu_back.domain.breed.entity.BreedDisease;
 import com.wagyu.wagyu_back.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,6 +10,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "pets")
@@ -31,8 +34,9 @@ public class Pet {
     @Column(nullable = false)
     private Short age;
 
-    @Column(nullable = false, length = 20)
-    private String breed;
+    @JoinColumn(name = "breed_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Breed breed;
 
     @Column(nullable = false, length = 1)
     private Character gender;
@@ -48,7 +52,10 @@ public class Pet {
     @Column(nullable = false, name = "is_deleted")
     private Boolean isDeleted;
 
-    public void update(String name, Short age, String breed, Character gender) {
+    @OneToMany(mappedBy = "pet")
+    private List<PetDisease> petDiseases;
+
+    public void update(String name, Short age, Breed breed, Character gender) {
         this.name = name;
         this.age = age;
         this.breed = breed;

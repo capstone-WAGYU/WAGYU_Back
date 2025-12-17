@@ -10,6 +10,8 @@ import java.util.List;
 public class HospitalDetailResponseDTO {
     private String name;
     private String address;
+    private Boolean is24Hours;
     private List<HospitalDetailScheduleResponseDTO> schedules;
     private List<HospitalDetailScheduleExceptionResponseDTO> scheduleExceptions;
+    private List<HospitalDetailAmenityResponseDTO> amenities;
 }

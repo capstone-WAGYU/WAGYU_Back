@@ -1,12 +1,18 @@
 package com.wagyu.wagyu_back.domain.hospital.service;
 
+import com.wagyu.wagyu_back.domain.hospital.dto.request.HospitalScheduleUpdateRequestDTO;
+import com.wagyu.wagyu_back.domain.hospital.dto.request.HospitalUpdateRequestDTO;
 import com.wagyu.wagyu_back.domain.hospital.dto.response.*;
 import com.wagyu.wagyu_back.domain.hospital.entity.Hospital;
+import com.wagyu.wagyu_back.domain.hospital.entity.HospitalAmenity;
 import com.wagyu.wagyu_back.domain.hospital.entity.HospitalSchedule;
 import com.wagyu.wagyu_back.domain.hospital.entity.HospitalScheduleException;
+import com.wagyu.wagyu_back.domain.hospital.repository.HospitalAmenityRepository;
 import com.wagyu.wagyu_back.domain.hospital.repository.HospitalRepository;
 import com.wagyu.wagyu_back.domain.hospital.repository.HospitalScheduleExceptionRepository;
 import com.wagyu.wagyu_back.domain.hospital.repository.HospitalScheduleRepository;
+import com.wagyu.wagyu_back.domain.user.entity.User;
+import com.wagyu.wagyu_back.domain.user.repository.UserRepository;
 import com.wagyu.wagyu_back.global.exception.CustomException;
 import com.wagyu.wagyu_back.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -14,11 +20,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +36,12 @@ public class HospitalService {
     private final HospitalRepository hospitalRepository;
     private final HospitalScheduleRepository hospitalScheduleRepository;
     private final HospitalScheduleExceptionRepository hospitalScheduleExceptionRepository;
+    private final HospitalAmenityRepository hospitalAmenityRepository;
 
+    private final UserRepository userRepository;
+
+    // 전체 병원 리스트 조회
+    @Transactional(readOnly = true)
     public Page<HospitalSummaryResponseDTO> getAllHospitals(Pageable pageable) {
         List<Hospital> hospitals = hospitalRepository.findAll(pageable);
         List<HospitalSummaryResponseDTO> hospitalSummaryResponseDTOS = hospitals.stream().map(hospital -> {
@@ -60,6 +75,8 @@ public class HospitalService {
         return new PageImpl<>(hospitalSummaryResponseDTOS, pageable, hospitals.size());
     }
 
+    // 병원 정보 상세 조회
+    @Transactional(readOnly = true)
     public HospitalDetailResponseDTO getHospitalDetail(Long hospitalId) {
         Hospital hospital = hospitalRepository.findById(hospitalId)
                 .orElseThrow(() -> new CustomException(ErrorCode.HOSPITAL_NOT_FOUND));
@@ -80,15 +97,25 @@ public class HospitalService {
                         .build()
                 ).toList();
 
+        List<HospitalAmenity> amenities = hospitalAmenityRepository.findAllByHospitalId(hospitalId);
+        List<HospitalDetailAmenityResponseDTO> amenityResponseDTOS = amenities.stream()
+                .map(a -> HospitalDetailAmenityResponseDTO.builder()
+                        .amenityCode(a.getAmenityCode())
+                        .build()
+                ).toList();
+
         return HospitalDetailResponseDTO.builder()
                 .name(hospital.getName())
                 .address(hospital.getAddress())
+                .is24Hours(hospital.getIs24Hours())
                 .schedules(scheduleDTOs)
                 .scheduleExceptions(scheduleExceptionDTOs)
+                .amenities(amenityResponseDTOS)
                 .build();
     }
 
     // 병원 스케줄 조회
+    @Transactional(readOnly = true)
     public HospitalScheduleResponseDTO getHospitalSchedule(Long hospitalId, LocalDate date) {
         Hospital hospital = hospitalRepository.findById(hospitalId)
                 .orElseThrow(() -> new CustomException(ErrorCode.HOSPITAL_NOT_FOUND));
@@ -112,5 +139,47 @@ public class HospitalService {
                 .closeTime(schedule.getCloseTime())
                 .isClosed(schedule.isClosed() || LocalTime.now().isAfter(schedule.getCloseTime()))
                 .build();
+    }
+
+    // 병원 정보 수정
+    @Transactional
+    public void updateHospital(String username, Long id, HospitalUpdateRequestDTO dto) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Hospital hospital = hospitalRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.HOSPITAL_NOT_FOUND));
+
+        if (!user.getId().equals(hospital.getOwner().getId())) {
+            throw new CustomException(ErrorCode.FORBIDDEN_UPDATE_HOSPITAL);
+        }
+
+        hospital.update(dto.getName(), dto.getAddress(), dto.getIs24Hours());
+
+        Map<Short, HospitalScheduleUpdateRequestDTO> scheduleMap = dto.getSchedules().stream()
+                .collect(Collectors.toMap(
+                        HospitalScheduleUpdateRequestDTO::getDayOfWeek,
+                        Function.identity()
+                ));
+        hospitalScheduleRepository.findAllByHospitalId(id)
+                .forEach(schedule -> {
+                    var scheduleDTO = scheduleMap.get(schedule.getDayOfWeek());
+                    if (scheduleDTO != null) {
+                        schedule.update(
+                                scheduleDTO.getOpenTime(),
+                                scheduleDTO.getCloseTime(),
+                                scheduleDTO.getIsClosed()
+                        );
+                    }
+                });
+
+        hospitalAmenityRepository.findAllByHospitalId(id);
+        List<HospitalAmenity> amenities = dto.getAmenities().stream()
+                .map(a -> HospitalAmenity.builder()
+                        .hospital(hospital)
+                        .amenityCode(a.getAmenityCode())
+                        .build()
+                ).toList();
+        hospitalAmenityRepository.saveAll(amenities);
     }
 }

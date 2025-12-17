@@ -27,4 +27,13 @@ public class Hospital {
 
     @Column(nullable = false, length = 100)
     private String address;
+
+    @Column(name = "is_24_hours", nullable = false)
+    private Boolean is24Hours;
+
+    public void update(String name, String address, Boolean is24Hours) {
+        this.name = name;
+        this.address = address;
+        this.is24Hours = is24Hours;
+    }
 }

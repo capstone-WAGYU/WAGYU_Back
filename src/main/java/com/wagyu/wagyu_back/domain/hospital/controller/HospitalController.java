@@ -1,5 +1,6 @@
 package com.wagyu.wagyu_back.domain.hospital.controller;
 
+import com.wagyu.wagyu_back.domain.hospital.dto.request.HospitalUpdateRequestDTO;
 import com.wagyu.wagyu_back.domain.hospital.dto.response.HospitalDetailResponseDTO;
 import com.wagyu.wagyu_back.domain.hospital.dto.response.HospitalScheduleResponseDTO;
 import com.wagyu.wagyu_back.domain.hospital.dto.response.HospitalSummaryResponseDTO;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -35,5 +37,15 @@ public class HospitalController {
             @RequestParam(name = "date")LocalDate date
     ) {
         return ResponseEntity.ok(ApiResponse.success(hospitalService.getHospitalSchedule(id, date)));
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<ApiResponse<Void>> updateHospital(
+            Authentication authentication,
+            @PathVariable Long id,
+            @RequestBody HospitalUpdateRequestDTO hospitalUpdateRequestDTO
+    ) {
+        hospitalService.updateHospital(authentication.getName(), id, hospitalUpdateRequestDTO);
+        return ResponseEntity.ok(ApiResponse.success());
     }
 }

@@ -34,4 +34,10 @@ public class HospitalSchedule {
 
     @Column(nullable = false, name = "is_closed")
     private boolean isClosed;
+
+    public void update(LocalTime open, LocalTime close, Boolean isClosed) {
+        this.openTime = open;
+        this.closeTime = close;
+        this.isClosed = isClosed;
+    }
 }

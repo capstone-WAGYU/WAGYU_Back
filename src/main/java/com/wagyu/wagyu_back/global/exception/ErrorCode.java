@@ -22,7 +22,8 @@ public enum ErrorCode {
     BREED_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 견종을 찾을 수 없습니다."),
 
     HOSPITAL_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 병원이 존재하지 않습니다."),
-    HOSPITAL_NO_SCHEDULE(HttpStatus.NOT_FOUND, "병원 일정이 존재하지 않습니다.");
+    HOSPITAL_NO_SCHEDULE(HttpStatus.NOT_FOUND, "병원 일정이 존재하지 않습니다."),
+    FORBIDDEN_UPDATE_HOSPITAL(HttpStatus.FORBIDDEN, "해당 병원의 정보를 수정할 권한이 없습니다.");
 
     private final HttpStatus status;
     private final String defaultMessage;

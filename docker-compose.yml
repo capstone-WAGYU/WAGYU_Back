@@ -24,7 +24,7 @@ services:
     ports:
       - "${PORT}:${PORT}"
     depends_on:
-      - mysql-db
+      - mysql
 
 volumes:
   mysql-data:

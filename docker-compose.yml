@@ -20,6 +20,7 @@ services:
       MYSQL_DB_NAME: ${MYSQL_DB_NAME}
       MYSQL_USERNAME: ${MYSQL_USERNAME}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
     ports:
       - "${PORT}:${PORT}"
     depends_on:

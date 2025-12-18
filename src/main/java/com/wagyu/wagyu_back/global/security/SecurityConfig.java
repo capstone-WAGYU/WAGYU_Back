@@ -50,6 +50,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/hospital/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/breed/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/disease/**").permitAll()
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);

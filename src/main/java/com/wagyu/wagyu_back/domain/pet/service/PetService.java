@@ -16,7 +16,7 @@ import com.wagyu.wagyu_back.domain.pet.entity.PetDiseaseId;
 import com.wagyu.wagyu_back.domain.pet.repository.PetDiseaseRepository;
 import com.wagyu.wagyu_back.domain.pet.repository.PetRepository;
 import com.wagyu.wagyu_back.domain.user.entity.User;
-import com.wagyu.wagyu_back.domain.user.service.UserService;
+import com.wagyu.wagyu_back.domain.user.repository.UserRepository;
 import com.wagyu.wagyu_back.global.exception.CustomException;
 import com.wagyu.wagyu_back.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class PetService {
-    private final UserService userService;
+    private final UserRepository userRepository;
 
     private final PetRepository petRepository;
     private final BreedRepository breedRepository;
@@ -48,7 +48,8 @@ public class PetService {
 
     @Transactional(readOnly = true)
     public PetListResponseDTO getPets(String username) {
-        User owner = userService.findByUsername(username);
+        User owner = userRepository.findByUsername(username)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         List<Pet> pets = petRepository.findAllByOwnerIdAndIsDeletedFalse(owner.getId());
 
@@ -84,7 +85,9 @@ public class PetService {
 
     @Transactional
     public void createPet(String username, PetCreateRequestDTO dto) {
-        User owner = userService.findByUsername(username);
+        User owner = userRepository.findByUsername(username)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
         if (petRepository.countAllByOwnerIdAndIsDeletedFalse(owner.getId()).orElse(0) >= 2) {
             throw new CustomException(ErrorCode.MAXIMUM_PET_COUNT);
         }
@@ -109,7 +112,9 @@ public class PetService {
 
     @Transactional
     public void updatePet(String username, Long petId, PetUpdateRequestDTO dto) {
-        User owner = userService.findByUsername(username);
+        User owner = userRepository.findByUsername(username)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
         Pet pet = petRepository.findByIdAndIsDeletedFalse(petId)
                 .orElseThrow(() -> new CustomException(ErrorCode.PET_NOT_FOUND));
 
@@ -129,7 +134,9 @@ public class PetService {
 
     @Transactional
     public void deletePet(String username, Long petId) {
-        User owner = userService.findByUsername(username);
+        User owner = userRepository.findByUsername(username)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
         Pet pet = petRepository.findByIdAndIsDeletedFalse(petId)
                 .orElseThrow(() -> new CustomException(ErrorCode.PET_NOT_FOUND));
 

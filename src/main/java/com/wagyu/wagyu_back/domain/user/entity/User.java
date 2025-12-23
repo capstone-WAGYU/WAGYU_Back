@@ -1,7 +1,6 @@
 package com.wagyu.wagyu_back.domain.user.entity;
 
 import com.wagyu.wagyu_back.domain.auth.enums.AuthLevel;
-import com.wagyu.wagyu_back.domain.auth.enums.Provider;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -34,13 +33,6 @@ public class User {
     @Column(name = "phone_num")
     private String phoneNum;
 
-    @Column
-    @Enumerated(EnumType.STRING)
-    private Provider provider;
-
-    @Column(name = "provider_id")
-    private String providerId;
-
     @Column(name = "auth_level", nullable = false)
     @Enumerated(EnumType.STRING)
     private AuthLevel authLevel;
@@ -52,4 +44,8 @@ public class User {
     @Column(name = "updated_at")
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    public void updatePhoneNum(String phoneNum) {
+        this.phoneNum = phoneNum;
+    }
 }

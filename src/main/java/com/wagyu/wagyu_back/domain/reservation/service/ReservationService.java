@@ -1,7 +1,6 @@
 package com.wagyu.wagyu_back.domain.reservation.service;
 
-import com.wagyu.wagyu_back.domain.reservation.dto.response.ReservationSummaryListResponseDTO;
-import com.wagyu.wagyu_back.domain.reservation.dto.response.ReservationSummaryResponseDTO;
+import com.wagyu.wagyu_back.domain.reservation.dto.response.*;
 import com.wagyu.wagyu_back.domain.reservation.entity.Reservation;
 import com.wagyu.wagyu_back.domain.reservation.repository.ReservationRepository;
 import com.wagyu.wagyu_back.domain.user.entity.User;
@@ -20,7 +19,7 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final UserRepository userRepository;
 
-    @Transactional
+    @Transactional(readOnly = true)
     public ReservationSummaryListResponseDTO getReservations(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -38,6 +37,34 @@ public class ReservationService {
                 ).toList();
         return ReservationSummaryListResponseDTO.builder()
                 .reservations(summaries)
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public ReservationDetailResponseDTO getReservationDetail(Long id) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
+
+        return ReservationDetailResponseDTO.builder()
+                .id(reservation.getId())
+                .pet(ReservationDetailPetResponseDTO.builder()
+                        .id(reservation.getPet().getId())
+                        .name(reservation.getPet().getName())
+                        .build()
+                )
+                .hospital(ReservationDetailHospitalResponseDTO.builder()
+                        .id(reservation.getHospital().getId())
+                        .name(reservation.getHospital().getName())
+                        .build()
+                )
+                .date(reservation.getDate())
+                .time(reservation.getTime())
+                .reason(reservation.getReason())
+                .comment(reservation.getComment())
+                .status(reservation.getStatus())
+                .hospitalComment(reservation.getHospitalComment())
+                .createdAt(reservation.getCreatedAt())
+                .updatedAt(reservation.getUpdatedAt())
                 .build();
     }
 }

@@ -54,6 +54,7 @@ public class Reservation {
     private String comment;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private ReservationStatus status;
 
     @Column(name = "hospital_comment")

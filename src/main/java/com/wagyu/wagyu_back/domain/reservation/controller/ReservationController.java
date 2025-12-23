@@ -1,5 +1,6 @@
 package com.wagyu.wagyu_back.domain.reservation.controller;
 
+import com.wagyu.wagyu_back.domain.reservation.dto.response.ReservationDetailResponseDTO;
 import com.wagyu.wagyu_back.domain.reservation.dto.response.ReservationSummaryListResponseDTO;
 import com.wagyu.wagyu_back.domain.reservation.service.ReservationService;
 import com.wagyu.wagyu_back.global.dto.ApiResponse;
@@ -8,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,12 +20,19 @@ public class ReservationController {
     private final ReservationService reservationService;
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('USER')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ApiResponse<ReservationSummaryListResponseDTO>> getReservations(
             Authentication authentication
     ) {
         return ResponseEntity.ok(
                 ApiResponse.success(reservationService.getReservations(authentication.getName()))
         );
+    }
+
+    @GetMapping("{id}")
+    public ResponseEntity<ApiResponse<ReservationDetailResponseDTO>> getReservationDetail(
+            @PathVariable Long id
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(reservationService.getReservationDetail(id)));
     }
 }

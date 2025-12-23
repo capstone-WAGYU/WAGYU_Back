@@ -1,5 +1,6 @@
 package com.wagyu.wagyu_back.domain.hospital.service;
 
+import com.wagyu.wagyu_back.domain.hospital.dto.request.HospitalCreateReservationRequestDTO;
 import com.wagyu.wagyu_back.domain.hospital.dto.request.HospitalScheduleUpdateRequestDTO;
 import com.wagyu.wagyu_back.domain.hospital.dto.request.HospitalUpdateRequestDTO;
 import com.wagyu.wagyu_back.domain.hospital.dto.response.*;
@@ -11,6 +12,11 @@ import com.wagyu.wagyu_back.domain.hospital.repository.HospitalAmenityRepository
 import com.wagyu.wagyu_back.domain.hospital.repository.HospitalRepository;
 import com.wagyu.wagyu_back.domain.hospital.repository.HospitalScheduleExceptionRepository;
 import com.wagyu.wagyu_back.domain.hospital.repository.HospitalScheduleRepository;
+import com.wagyu.wagyu_back.domain.pet.entity.Pet;
+import com.wagyu.wagyu_back.domain.pet.repository.PetRepository;
+import com.wagyu.wagyu_back.domain.reservation.entity.Reservation;
+import com.wagyu.wagyu_back.domain.reservation.enums.ReservationStatus;
+import com.wagyu.wagyu_back.domain.reservation.repository.ReservationRepository;
 import com.wagyu.wagyu_back.domain.user.entity.User;
 import com.wagyu.wagyu_back.domain.user.repository.UserRepository;
 import com.wagyu.wagyu_back.global.exception.CustomException;
@@ -39,6 +45,8 @@ public class HospitalService {
     private final HospitalAmenityRepository hospitalAmenityRepository;
 
     private final UserRepository userRepository;
+    private final PetRepository petRepository;
+    private final ReservationRepository reservationRepository;
 
     private List<HospitalSummaryResponseDTO> convertHospitals(List<Hospital> hospitals) {
         return hospitals.stream().map(hospital -> {
@@ -194,5 +202,30 @@ public class HospitalService {
                         .build()
                 ).toList();
         hospitalAmenityRepository.saveAll(amenities);
+    }
+
+    // 병원 예약
+    @Transactional
+    public void createHospitalReservation(String username, Long id, HospitalCreateReservationRequestDTO dto) {
+        Hospital hospital = hospitalRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.HOSPITAL_NOT_FOUND));
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Pet pet = petRepository.findByIdAndIsDeletedFalse(dto.getPetId())
+                .orElseThrow(() -> new CustomException(ErrorCode.PET_NOT_FOUND));
+
+        Reservation reservation = Reservation.builder()
+                .user(user)
+                .pet(pet)
+                .hospital(hospital)
+                .date(dto.getDate())
+                .time(dto.getTime())
+                .reason(dto.getReason())
+                .comment(dto.getComment())
+                .status(ReservationStatus.PENDING)
+                .build();
+        reservationRepository.save(reservation);
     }
 }

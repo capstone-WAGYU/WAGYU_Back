@@ -1,5 +1,6 @@
 package com.wagyu.wagyu_back.domain.hospital.controller;
 
+import com.wagyu.wagyu_back.domain.hospital.dto.request.HospitalCreateReservationRequestDTO;
 import com.wagyu.wagyu_back.domain.hospital.dto.request.HospitalUpdateRequestDTO;
 import com.wagyu.wagyu_back.domain.hospital.dto.response.HospitalDetailResponseDTO;
 import com.wagyu.wagyu_back.domain.hospital.dto.response.HospitalScheduleResponseDTO;
@@ -10,7 +11,9 @@ import com.wagyu.wagyu_back.global.dto.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,5 +58,16 @@ public class HospitalController {
     ) {
         hospitalService.updateHospital(authentication.getName(), id, hospitalUpdateRequestDTO);
         return ResponseEntity.ok(ApiResponse.success());
+    }
+
+    @PostMapping("{id}/reservation")
+    @PreAuthorize("hasAuthority('USER')")
+    public ResponseEntity<ApiResponse<Void>> createHospitalReservation(
+            Authentication authentication,
+            @PathVariable Long id,
+            @RequestBody HospitalCreateReservationRequestDTO dto
+    ) {
+        hospitalService.createHospitalReservation(authentication.getName(), id, dto);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

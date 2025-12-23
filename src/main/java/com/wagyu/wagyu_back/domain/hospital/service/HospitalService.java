@@ -40,11 +40,8 @@ public class HospitalService {
 
     private final UserRepository userRepository;
 
-    // 전체 병원 리스트 조회
-    @Transactional(readOnly = true)
-    public Page<HospitalSummaryResponseDTO> getAllHospitals(Pageable pageable) {
-        List<Hospital> hospitals = hospitalRepository.findAll(pageable);
-        List<HospitalSummaryResponseDTO> hospitalSummaryResponseDTOS = hospitals.stream().map(hospital -> {
+    private List<HospitalSummaryResponseDTO> convertHospitals(List<Hospital> hospitals) {
+        return hospitals.stream().map(hospital -> {
 
             Optional<HospitalScheduleException> optExSchedule = hospitalScheduleExceptionRepository
                     .findByHospitalIdAndDate(hospital.getId(), LocalDate.now());
@@ -72,7 +69,23 @@ public class HospitalService {
                     .isClosed(schedule.isClosed() || LocalTime.now().isAfter(schedule.getCloseTime()))
                     .build();
         }).toList();
-        return new PageImpl<>(hospitalSummaryResponseDTOS, pageable, hospitals.size());
+    }
+
+    // 전체 병원 리스트 조회
+    @Transactional(readOnly = true)
+    public Page<HospitalSummaryResponseDTO> getAllHospitals(Pageable pageable) {
+        Page<Hospital> hospitals = hospitalRepository.findAll(pageable);
+        List<HospitalSummaryResponseDTO> hospitalSummaryResponseDTOS = convertHospitals(hospitals.getContent());
+        return new PageImpl<>(hospitalSummaryResponseDTOS, pageable, hospitals.getTotalElements());
+    }
+
+    @Transactional(readOnly = true)
+    public HospitalSummaryListResponseDTO searchHospital(String name) {
+        List<Hospital> hospitals = hospitalRepository.searchByName(name);
+        List<HospitalSummaryResponseDTO> hospitalSummaryResponseDTOS = convertHospitals(hospitals);
+        return HospitalSummaryListResponseDTO.builder()
+                .hospitals(hospitalSummaryResponseDTOS)
+                .build();
     }
 
     // 병원 정보 상세 조회

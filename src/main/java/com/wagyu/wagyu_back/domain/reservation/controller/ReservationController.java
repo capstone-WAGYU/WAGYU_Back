@@ -1,5 +1,6 @@
 package com.wagyu.wagyu_back.domain.reservation.controller;
 
+import com.wagyu.wagyu_back.domain.auth.enums.AuthLevel;
 import com.wagyu.wagyu_back.domain.reservation.dto.response.ReservationDetailResponseDTO;
 import com.wagyu.wagyu_back.domain.reservation.dto.response.ReservationSummaryListResponseDTO;
 import com.wagyu.wagyu_back.domain.reservation.service.ReservationService;
@@ -20,12 +21,17 @@ public class ReservationController {
     private final ReservationService reservationService;
 
     @GetMapping
-    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ApiResponse<ReservationSummaryListResponseDTO>> getReservations(
             Authentication authentication
     ) {
         return ResponseEntity.ok(
-                ApiResponse.success(reservationService.getReservations(authentication.getName()))
+                ApiResponse.success(reservationService.getReservations(
+                        authentication.getName(), authentication.getAuthorities()
+                                .stream()
+                                .findFirst()
+                                .map(a -> AuthLevel.valueOf(a.getAuthority()))
+                                .orElseThrow()
+                ))
         );
     }
 

@@ -11,6 +11,7 @@ import java.util.List;
 
 public interface HospitalRepository extends CrudRepository<Hospital, Long> {
     Page<Hospital> findAll(Pageable pageable);
+    Hospital findByOwnerId(Long ownerId);
 
     @Query(value = "SELECT * FROM hospitals WHERE MATCH(name) AGAINST(:name IN NATURAL LANGUAGE MODE)", nativeQuery = true)
     List<Hospital> searchByName(@Param("name") String name);

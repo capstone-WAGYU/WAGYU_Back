@@ -1,5 +1,8 @@
 package com.wagyu.wagyu_back.domain.reservation.service;
 
+import com.wagyu.wagyu_back.domain.auth.enums.AuthLevel;
+import com.wagyu.wagyu_back.domain.hospital.entity.Hospital;
+import com.wagyu.wagyu_back.domain.hospital.repository.HospitalRepository;
 import com.wagyu.wagyu_back.domain.reservation.dto.response.*;
 import com.wagyu.wagyu_back.domain.reservation.entity.Reservation;
 import com.wagyu.wagyu_back.domain.reservation.repository.ReservationRepository;
@@ -18,13 +21,23 @@ import java.util.List;
 public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final UserRepository userRepository;
+    private final HospitalRepository hospitalRepository;
 
     @Transactional(readOnly = true)
-    public ReservationSummaryListResponseDTO getReservations(String username) {
+    public ReservationSummaryListResponseDTO getReservations(String username, AuthLevel authLevel) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        List<Reservation> reservations = reservationRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId());
+        List<Reservation> reservations;
+        if (authLevel == AuthLevel.USER) {
+            reservations = reservationRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId());
+        } else if (authLevel == AuthLevel.HOSPITAL) {
+            Hospital hospital = hospitalRepository.findByOwnerId(user.getId());
+            reservations = reservationRepository.findAllByHospitalIdOrderByCreatedAtDesc(hospital.getId());
+        } else {
+            throw new CustomException(ErrorCode.INVALID_REQUEST);
+        }
+
         List<ReservationSummaryResponseDTO> summaries = reservations.stream()
                 .map(r -> ReservationSummaryResponseDTO.builder()
                         .id(r.getId())

@@ -44,4 +44,8 @@ public class User {
     @Column(name = "updated_at")
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    public void updatePhoneNum(String phoneNum) {
+        this.phoneNum = phoneNum;
+    }
 }

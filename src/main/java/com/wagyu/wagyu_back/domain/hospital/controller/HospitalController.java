@@ -3,6 +3,7 @@ package com.wagyu.wagyu_back.domain.hospital.controller;
 import com.wagyu.wagyu_back.domain.hospital.dto.request.HospitalUpdateRequestDTO;
 import com.wagyu.wagyu_back.domain.hospital.dto.response.HospitalDetailResponseDTO;
 import com.wagyu.wagyu_back.domain.hospital.dto.response.HospitalScheduleResponseDTO;
+import com.wagyu.wagyu_back.domain.hospital.dto.response.HospitalSummaryListResponseDTO;
 import com.wagyu.wagyu_back.domain.hospital.dto.response.HospitalSummaryResponseDTO;
 import com.wagyu.wagyu_back.domain.hospital.service.HospitalService;
 import com.wagyu.wagyu_back.global.dto.ApiResponse;
@@ -24,6 +25,13 @@ public class HospitalController {
     @GetMapping
     public ResponseEntity<ApiResponse<Page<HospitalSummaryResponseDTO>>> getAllHospitals(Pageable pageable) {
         return ResponseEntity.ok(ApiResponse.success(hospitalService.getAllHospitals(pageable)));
+    }
+
+    @GetMapping("search")
+    public ResponseEntity<ApiResponse<HospitalSummaryListResponseDTO>> searchHospital(
+            @RequestParam String name
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(hospitalService.searchHospital(name)));
     }
 
     @GetMapping("{id}")

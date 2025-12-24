@@ -45,8 +45,8 @@ public class User {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    @Column(name = "is_deleted")
-    private Boolean isDeleted = false;
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted;
 
     public void updatePhoneNum(String phoneNum) {
         this.phoneNum = phoneNum;

@@ -46,6 +46,7 @@ public class AuthService {
                 .password(passwordEncoder.encode(registerRequestDTO.getPassword()))
                 .nickname(registerRequestDTO.getNickname())
                 .authLevel(AuthLevel.USER)
+                .isDeleted(false)
                 .build();
 
         userRepository.save(user);

@@ -165,7 +165,7 @@ public class HospitalService {
     // 병원 정보 수정
     @Transactional
     public void updateHospital(String username, Long id, HospitalUpdateRequestDTO dto) {
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsernameAndIsDeletedFalse(username)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Hospital hospital = hospitalRepository.findById(id)
@@ -210,7 +210,7 @@ public class HospitalService {
         Hospital hospital = hospitalRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.HOSPITAL_NOT_FOUND));
 
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsernameAndIsDeletedFalse(username)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Pet pet = petRepository.findByIdAndIsDeletedFalse(dto.getPetId())

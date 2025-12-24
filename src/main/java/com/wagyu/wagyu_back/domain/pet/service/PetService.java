@@ -48,7 +48,7 @@ public class PetService {
 
     @Transactional(readOnly = true)
     public PetListResponseDTO getPets(String username) {
-        User owner = userRepository.findByUsername(username)
+        User owner = userRepository.findByUsernameAndIsDeletedFalse(username)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         List<Pet> pets = petRepository.findAllByOwnerIdAndIsDeletedFalse(owner.getId());
@@ -85,7 +85,7 @@ public class PetService {
 
     @Transactional
     public void createPet(String username, PetCreateRequestDTO dto) {
-        User owner = userRepository.findByUsername(username)
+        User owner = userRepository.findByUsernameAndIsDeletedFalse(username)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         if (petRepository.countAllByOwnerIdAndIsDeletedFalse(owner.getId()).orElse(0) >= 2) {
@@ -112,7 +112,7 @@ public class PetService {
 
     @Transactional
     public void updatePet(String username, Long petId, PetUpdateRequestDTO dto) {
-        User owner = userRepository.findByUsername(username)
+        User owner = userRepository.findByUsernameAndIsDeletedFalse(username)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Pet pet = petRepository.findByIdAndIsDeletedFalse(petId)
@@ -134,7 +134,7 @@ public class PetService {
 
     @Transactional
     public void deletePet(String username, Long petId) {
-        User owner = userRepository.findByUsername(username)
+        User owner = userRepository.findByUsernameAndIsDeletedFalse(username)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Pet pet = petRepository.findByIdAndIsDeletedFalse(petId)

@@ -17,7 +17,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserProfileResponseDTO getUserProfile(String username) {
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsernameAndIsDeletedFalse(username)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         return UserProfileResponseDTO.builder()
@@ -30,8 +30,16 @@ public class UserService {
     }
 
     @Transactional
+    public void deleteUser(String username) {
+        User user = userRepository.findByUsernameAndIsDeletedFalse(username)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        user.delete();
+    }
+
+    @Transactional
     public void updatePhoneNum(String username, UserUpdatePhoneNumRequestDTO dto) {
-        User user =  userRepository.findByUsername(username)
+        User user =  userRepository.findByUsernameAndIsDeletedFalse(username)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         user.updatePhoneNum(dto.getPhoneNum());

@@ -60,7 +60,7 @@ public class AuthService {
         String accessToken = tokenProvider.createToken(dto.getUsername());
         String refreshToken = tokenProvider.createRefreshToken(dto.getUsername());
 
-        User user = userRepository.findByUsername(dto.getUsername())
+        User user = userRepository.findByUsernameAndIsDeletedFalse(dto.getUsername())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         RefreshToken rf = RefreshToken.builder()

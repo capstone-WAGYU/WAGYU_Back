@@ -20,6 +20,12 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success(userService.getUserProfile(authentication.getName())));
     }
 
+    @DeleteMapping("me")
+    public ResponseEntity<ApiResponse<Void>> deleteUser(Authentication authentication) {
+        userService.deleteUser(authentication.getName());
+        return ResponseEntity.noContent().build();
+    }
+
     @PatchMapping("phone")
     public ResponseEntity<ApiResponse<Void>> updatePhoneNum(
             Authentication authentication,

@@ -27,7 +27,7 @@ public class ReservationService {
 
     @Transactional(readOnly = true)
     public ReservationSummaryListResponseDTO getReservations(String username, AuthLevel authLevel) {
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsernameAndIsDeletedFalse(username)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         List<Reservation> reservations;
@@ -88,7 +88,7 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
 
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsernameAndIsDeletedFalse(username)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         User owner = reservation.getHospital().getOwner();

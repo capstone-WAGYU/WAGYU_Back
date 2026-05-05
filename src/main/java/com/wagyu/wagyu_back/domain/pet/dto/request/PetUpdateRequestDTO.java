@@ -1,24 +1,27 @@
 package com.wagyu.wagyu_back.domain.pet.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
 @Getter
+@Setter
 public class PetUpdateRequestDTO {
     @NotBlank
     private String name;
 
-    @NotBlank
+    @NotNull
     private Short age;
 
-    @NotBlank
+    @NotNull
     private Long breedId;
 
-    @NotBlank
+    @NotNull
     private Character gender;
 
-    @NotBlank
+    @NotNull
     private List<Long> diseaseIds;
 }

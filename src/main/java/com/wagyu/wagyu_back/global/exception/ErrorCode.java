@@ -26,7 +26,10 @@ public enum ErrorCode {
     FORBIDDEN_UPDATE_HOSPITAL(HttpStatus.FORBIDDEN, "해당 병원의 정보를 수정할 권한이 없습니다."),
 
     RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 예약을 찾을 수 없습니다."),
-    FORBIDDEN_UPDATE_RESERVATION(HttpStatus.FORBIDDEN, "해당 예약을 수정할 권한이 없습니다.");
+    FORBIDDEN_UPDATE_RESERVATION(HttpStatus.FORBIDDEN, "해당 예약을 수정할 권한이 없습니다."),
+
+    INVALID_FILE_TYPE(HttpStatus.BAD_REQUEST, "허용되지 않는 파일 형식입니다."),
+    FILE_TOO_LARGE(HttpStatus.PAYLOAD_TOO_LARGE, "파일 크기가 너무 큽니다.");
 
     private final HttpStatus status;
     private final String defaultMessage;

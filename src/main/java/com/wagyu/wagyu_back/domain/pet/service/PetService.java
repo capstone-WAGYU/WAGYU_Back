@@ -76,6 +76,7 @@ public class PetService {
                     .age(pet.getAge())
                     .breed(breedResponseDTO)
                     .gender(pet.getGender())
+                    .imageUrl(pet.getImageUrl())
                     .diseases(diseases)
                     .build();
             }

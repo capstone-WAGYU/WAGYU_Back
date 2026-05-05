@@ -19,9 +19,11 @@ import com.wagyu.wagyu_back.domain.user.entity.User;
 import com.wagyu.wagyu_back.domain.user.repository.UserRepository;
 import com.wagyu.wagyu_back.global.exception.CustomException;
 import com.wagyu.wagyu_back.global.exception.ErrorCode;
+import com.wagyu.wagyu_back.global.storage.FileStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -35,6 +37,10 @@ public class PetService {
     private final DiseaseRepository diseaseRepository;
 
     private final PetDiseaseRepository petDiseaseRepository;
+
+    private final FileStorageService fileStorageService;
+
+    private static final String PET_IMAGE_DIR = "pets";
 
     private void savePetDisease(Pet pet, List<Disease> diseases) {
         List<PetDisease> petDiseases = diseases.stream().map(disease -> PetDisease.builder()
@@ -85,7 +91,7 @@ public class PetService {
     }
 
     @Transactional
-    public void createPet(String username, PetCreateRequestDTO dto) {
+    public void createPet(String username, PetCreateRequestDTO dto, MultipartFile image) {
         User owner = userRepository.findByUsernameAndIsDeletedFalse(username)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
@@ -96,11 +102,16 @@ public class PetService {
         Breed breed = breedRepository.findById(dto.getBreedId())
                 .orElseThrow(() -> new CustomException(ErrorCode.BREED_NOT_FOUND));
 
+        String imageUrl = (image != null && !image.isEmpty())
+                ? fileStorageService.store(image, PET_IMAGE_DIR)
+                : null;
+
         Pet pet = Pet.builder()
                 .name(dto.getName())
                 .age(dto.getAge())
                 .breed(breed)
                 .gender(dto.getGender())
+                .imageUrl(imageUrl)
                 .owner(owner)
                 .isDeleted(false)
                 .build();
@@ -112,7 +123,7 @@ public class PetService {
     }
 
     @Transactional
-    public void updatePet(String username, Long petId, PetUpdateRequestDTO dto) {
+    public void updatePet(String username, Long petId, PetUpdateRequestDTO dto, MultipartFile image) {
         User owner = userRepository.findByUsernameAndIsDeletedFalse(username)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
@@ -126,6 +137,13 @@ public class PetService {
         Breed breed = breedRepository.findById(dto.getBreedId())
                 .orElseThrow(() -> new CustomException(ErrorCode.BREED_NOT_FOUND));
         pet.update(dto.getName(), dto.getAge(), breed, dto.getGender());
+
+        if (image != null && !image.isEmpty()) {
+            String oldImageUrl = pet.getImageUrl();
+            String newImageUrl = fileStorageService.store(image, PET_IMAGE_DIR);
+            pet.updateImageUrl(newImageUrl);
+            fileStorageService.delete(oldImageUrl);
+        }
 
         // pet disease n:m 삭제 후 추가
         petDiseaseRepository.deleteAllByPetId(petId);

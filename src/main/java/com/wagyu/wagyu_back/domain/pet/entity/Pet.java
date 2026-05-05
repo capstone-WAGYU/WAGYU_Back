@@ -41,6 +41,9 @@ public class Pet {
     @Column(nullable = false, length = 1)
     private Character gender;
 
+    @Column(name = "image_url", length = 255)
+    private String imageUrl;
+
     @Column(name = "created_at")
     @CreatedDate
     private LocalDateTime createdAt;
@@ -60,6 +63,10 @@ public class Pet {
         this.age = age;
         this.breed = breed;
         this.gender = gender;
+    }
+
+    public void updateImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public void delete() {

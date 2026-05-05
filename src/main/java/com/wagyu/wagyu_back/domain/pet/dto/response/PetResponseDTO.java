@@ -20,5 +20,7 @@ public class PetResponseDTO {
 
     private Character gender;
 
+    private String imageUrl;
+
     private List<DiseaseResponseDTO> diseases;
 }
